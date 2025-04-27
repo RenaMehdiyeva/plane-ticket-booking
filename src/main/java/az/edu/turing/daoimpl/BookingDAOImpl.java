@@ -2,42 +2,54 @@ package az.edu.turing.daoimpl;
 
 import az.edu.turing.dao.BookingDAO;
 import az.edu.turing.entity.Booking;
+import az.edu.turing.util.FileUtil;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class BookingDAOImpl implements BookingDAO {
-    private static final String BOOKING_DATA_FILE = "bookings.dat";
+    private static final String BOOKINGS_FILE = "bookings.dat";
+    private List<Booking> bookings;
+
+    public BookingDAOImpl() {
+        this.bookings = FileUtil.readFromFile(BOOKINGS_FILE);
+        if (this.bookings == null) {
+            this.bookings = new ArrayList<>();
+        }
+    }
 
     @Override
     public List<Booking> getAllBookings() {
-        List<Booking> bookings = new ArrayList<>();
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(BOOKING_DATA_FILE))) {
-            bookings = (List<Booking>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return bookings;
+        return new ArrayList<>(bookings);
     }
 
     @Override
     public Booking getBookingById(String bookingId) {
-        List<Booking> bookings = getAllBookings();
-        for (Booking booking : bookings) {
-            if (booking.getId().equals(bookingId)) {
-                return booking;
-            }
-        }
-        return null;
+        return bookings.stream()
+                .filter(b -> b.getBookingId().equals(bookingId))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
-    public void saveBookings(List<Booking> bookings) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(BOOKING_DATA_FILE))) {
-            oos.writeObject(bookings);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public boolean saveBooking(Booking booking) {
+        bookings.add(booking);
+        FileUtil.writeToFile(BOOKINGS_FILE, bookings);
+        return true;
+    }
+
+    @Override
+    public boolean deleteBooking(String bookingId) {
+        Optional<Booking> bookingToRemove = bookings.stream()
+                .filter(b -> b.getBookingId().equals(bookingId))
+                .findFirst();
+
+        if (bookingToRemove.isPresent()) {
+            bookings.remove(bookingToRemove.get());
+            FileUtil.writeToFile(BOOKINGS_FILE, bookings);
+            return true;
         }
+        return false;
     }
 }

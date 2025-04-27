@@ -2,26 +2,25 @@ package az.edu.turing.console;
 
 import az.edu.turing.controller.BookingController;
 import az.edu.turing.controller.FlightController;
-import az.edu.turing.controllerimpl.BookingControllerImpl;
-import az.edu.turing.controllerimpl.FlightControllerImpl;
+import az.edu.turing.entity.Passenger;
 import az.edu.turing.exception.InvalidMenuOptionException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleApp {
-    private static final Scanner scanner = new Scanner(System.in);
+    private final FlightController flightController;
+    private final BookingController bookingController;
+    private final Scanner scanner = new Scanner(System.in);
 
-    private static final FlightController flightController = new FlightControllerImpl();
-    private static final BookingController bookingController = new BookingControllerImpl();
-
-    public static void main(String[] args) {
-        ConsoleApp app = new ConsoleApp();
-        app.run();
+    public ConsoleApp(FlightController flightController, BookingController bookingController) {
+        this.flightController = flightController;
+        this.bookingController = bookingController;
     }
 
-    private void run() {
+    public void run() {
         boolean running = true;
-
         while (running) {
             showMainMenu();
             int choice = getUserMenuChoice();
@@ -31,43 +30,38 @@ public class ConsoleApp {
 
     private void showMainMenu() {
         System.out.println("\n=== Main Menu ===");
-        System.out.println("1. Show online board (Flights from Kiev in the next 24 hours)");
-        System.out.println("2. Show flight details");
-        System.out.println("3. Search and book a flight");
-        System.out.println("4. Cancel a booking");
-        System.out.println("5. View my bookings");
+        System.out.println("1. Online board (flights from Kiev in the next 24 hours)");
+        System.out.println("2. Show flight information");
+        System.out.println("3. Search and book flights");
+        System.out.println("4. Cancel reservation");
+        System.out.println("5. My flights");
         System.out.println("6. Exit");
-        System.out.print("Please choose an option: ");
+        System.out.print("Choose: ");
     }
 
     private int getUserMenuChoice() {
-        return Integer.parseInt(scanner.nextLine());
+        try {
+            return Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     private boolean handleUserChoice(int choice) {
         try {
             switch (choice) {
-                case 1: displayFlights(); break;
+                case 1: flightController.displayAvailableFlights(); break;
                 case 2: showFlightDetails(); break;
                 case 3: searchAndBookFlight(); break;
                 case 4: cancelBooking(); break;
                 case 5: viewMyFlights(); break;
                 case 6: return false;
-                default: throw new InvalidMenuOptionException("Invalid menu option! Please choose between 1 and 6.");
+                default: throw new InvalidMenuOptionException("Invalid menu selection! Enter a number between 1-6.");
             }
         } catch (InvalidMenuOptionException e) {
-            handleInvalidMenuOptionException(e);
+            System.out.println("⚠️ " + e.getMessage());
         }
         return true;
-    }
-
-    private void handleInvalidMenuOptionException(InvalidMenuOptionException e) {
-        System.out.println("⚠️ " + e.getMessage());
-    }
-
-    private void displayFlights() {
-        System.out.println("\n=== Flights from Kiev (Next 24 hours) ===");
-        flightController.displayAvailableFlights();
     }
 
     private void showFlightDetails() {
@@ -77,29 +71,29 @@ public class ConsoleApp {
     }
 
     private void searchAndBookFlight() {
-        String destination = getDestination();
-        String date = getDate();
-        int numPassengers = getNumberOfPassengers();
-        bookingController.searchAndBookFlight(destination, date, numPassengers);
+        System.out.print("Destination city: ");
+        String destination = scanner.nextLine();
+
+        System.out.print("Date (yyyy-mm-dd): ");
+        String date = scanner.nextLine();
+
+        System.out.print("Number of passengers: ");
+        int numPassengers = Integer.parseInt(scanner.nextLine());
+
+        List<Passenger> passengers = new ArrayList<>();
+        for (int i = 0; i < numPassengers; i++) {
+            System.out.println("Passenger " + (i + 1) + " info:");
+            System.out.print("Full name: ");
+            String fullName = scanner.nextLine();
+            passengers.add(new Passenger(fullName));
+        }
+
+        bookingController.bookFlight(destination, date, passengers);
     }
 
-    private String getDestination() {
-        System.out.print("Enter destination: ");
-        return scanner.nextLine();
-    }
-
-    private String getDate() {
-        System.out.print("Enter date (yyyy-mm-dd): ");
-        return scanner.nextLine();
-    }
-
-    private int getNumberOfPassengers() {
-        System.out.print("Enter number of passengers: ");
-        return Integer.parseInt(scanner.nextLine());
-    }
 
     private void cancelBooking() {
-        System.out.print("Enter booking ID to cancel: ");
+        System.out.print("Enter your booking ID: ");
         String bookingId = scanner.nextLine();
         bookingController.cancelBooking(bookingId);
     }
@@ -107,6 +101,6 @@ public class ConsoleApp {
     private void viewMyFlights() {
         System.out.print("Enter your full name: ");
         String fullName = scanner.nextLine();
-        bookingController.viewMyBookings(fullName);
+        bookingController.viewBookings(fullName);
     }
 }

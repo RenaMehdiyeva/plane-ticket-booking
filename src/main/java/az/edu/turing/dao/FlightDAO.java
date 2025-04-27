@@ -8,4 +8,5 @@ public interface FlightDAO {
     List<Flight> getAllFlights();
     Flight getFlightById(String flightId);
     void saveFlights(List<Flight> flights);
+    boolean updateFlight(Flight flight);
 }

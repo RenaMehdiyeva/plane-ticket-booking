@@ -8,17 +8,16 @@ public class FileUtil {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName))) {
             oos.writeObject(data);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("File writing error: " + e.getMessage());
         }
     }
 
     public static <T> List<T> readFromFile(String fileName) {
-        List<T> data = null;
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName))) {
-            data = (List<T>) ois.readObject();
+            return (List<T>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            System.err.println("Error reading from file: " + e.getMessage());
+            return null;
         }
-        return data;
     }
 }

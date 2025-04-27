@@ -1,52 +1,58 @@
 package az.edu.turing.entity;
 
-import java.time.LocalDateTime;
-
 public class Flight {
-    private String id;
-    private String from;
-    private String to;
-    private String dateTime;
+    private String flightId;
+    private String destination;
+    private String date;
+    private String time;
     private int availableSeats;
 
-    public Flight(String id, String from, String to, String dateTime, int availableSeats) {
-        this.id = id;
-        this.from = from;
-        this.to = to;
-        this.dateTime = dateTime;
+    public Flight(String flightId, String destination, String date, String time, int availableSeats) {
+        this.flightId = flightId;
+        this.destination = destination;
+        this.date = date;
+        this.time = time;
         this.availableSeats = availableSeats;
     }
 
+    public String getFlightId() {
+        return flightId;
+    }
+
+    public void setFlightId(String flightId) {
+        this.flightId = flightId;
+    }
+
     public String getId() {
-        return id;
+        return flightId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public String getDestination() {
+        return destination;
     }
 
-    public String getFrom() {
-        return from;
+    public void setDestination(String destination) {
+        this.destination = destination;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
+    public String getDeparture() {
+        return date + " " + time;
     }
 
-    public String getTo() {
-        return to;
+    public String getDate() {
+        return date;
     }
 
-    public void setTo(String to) {
-        this.to = to;
+    public void setDate(String date) {
+        this.date = date;
     }
 
-    public String getDateTime() {
-        return dateTime;
+    public String getTime() {
+        return time;
     }
 
-    public void setDateTime(String dateTime) {
-        this.dateTime = dateTime;
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public int getAvailableSeats() {
@@ -57,14 +63,8 @@ public class Flight {
         this.availableSeats = availableSeats;
     }
 
-    @Override
     public String toString() {
-        return "Flight{" +
-                "id='" + id + '\'' +
-                ", from='" + from + '\'' +
-                ", to='" + to + '\'' +
-                ", dateTime='" + dateTime + '\'' +
-                ", availableSeats=" + availableSeats +
-                '}';
+        return String.format("Flight %s: %s | Date: %s %s | Vacancy: %d",
+                flightId, destination, date, time, availableSeats);
     }
 }

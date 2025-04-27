@@ -7,5 +7,6 @@ import java.util.List;
 public interface BookingDAO {
     List<Booking> getAllBookings();
     Booking getBookingById(String bookingId);
-    void saveBookings(List<Booking> bookings);
+    boolean saveBooking(Booking booking);
+    boolean deleteBooking(String bookingId);
 }
